@@ -6,10 +6,19 @@
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
+
+void error(char *msg)
+{
+    perror(msg);
+    exit(1);
+}
+
+int main(int argc, char *argv[])
+{
 char *content =
 "<p>hit the quan</p>"
 "<b>hit the quaran</b>";
-char *reply= 
+char reply[MSGSIZE]= 
 "HTTP/1.1 200 OK\n"
 "Date: Thu, 19 Feb 2009 12:27:04 GMT\n"
 "Server: Apache/2.2.3\n"
@@ -21,14 +30,6 @@ char *reply=
 "Connection: close\n"
 "\n"; 
 strcat(reply,content);
-void error(char *msg)
-{
-    perror(msg);
-    exit(1);
-}
-
-int main(int argc, char *argv[])
-{
      int sockfd, newsockfd, portno, clilen;
      char buffer[MSGSIZE];
      struct sockaddr_in serv_addr, cli_addr;
