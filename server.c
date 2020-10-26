@@ -1,4 +1,4 @@
-#define MSGSIZE 512
+#define MSGSIZE 1024
 #include<stdlib.h>
 #include<string.h>
 #include<unistd.h>
@@ -6,6 +6,9 @@
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
+char *content =
+"<p>hit the quan</p>"
+"<b>hit the quaran</b>";
 char *reply= 
 "HTTP/1.1 200 OK\n"
 "Date: Thu, 19 Feb 2009 12:27:04 GMT\n"
@@ -13,11 +16,11 @@ char *reply=
 "Last-Modified: Wed, 18 Jun 2003 16:05:58 GMT\n"
 "ETag: \"56d-9989200-1132c580\"\n"
 "Content-Type: text/html\n"
-"Content-Length: 15\n"
+"Content-Length: 30\n"
 "Accept-Ranges: bytes\n"
 "Connection: close\n"
-"\n"
-"sdfkjsdnbfkjbsf";
+"\n"; 
+strcat(reply,content);
 void error(char *msg)
 {
     perror(msg);
@@ -59,9 +62,11 @@ int main(int argc, char *argv[])
      if (strstr(buffer, "STOP") != NULL)
 	     flag = 0;
      bzero(buffer,MSGSIZE);
-     if (flag)
+     if (flag){
+	     printf("%d\n%s", strlen(reply), reply);
 	     n = write(newsockfd,reply,strlen(reply));
-     else
+     }
+	else
 	     n = write(newsockfd,"STOPPING",8);
      if (n < 0) error("ERROR writing to socket");
      }
