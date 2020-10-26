@@ -6,18 +6,32 @@
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
-
+#include<signal.h>
 void error(char *msg)
 {
     perror(msg);
     exit(1);
 }
-
 int main(int argc, char *argv[])
 {
+signal(SIGPIPE, SIG_IGN);
+char *gamercontent =
+"<b>YOU HAVE REACHED GAMER PAGE</b>";
+char gamerreply[MSGSIZE]= 
+"HTTP/1.1 200 OK\n"
+"Date: Thu, 19 Feb 2009 12:27:04 GMT\n"
+"Server: Apache/2.2.3\n"
+"Last-Modified: Wed, 18 Jun 2003 16:05:58 GMT\n"
+"ETag: \"56d-9989200-1132c580\"\n"
+"Content-Type: text/html\n"
+"Content-Length: 50\n"
+"Accept-Ranges: bytes\n"
+"Connection: close\n"
+"\n"; 
+strcat(gamerreply,gamercontent);
 char *content =
 "<p>hit the quan</p>"
-"<b>hit the quaran</b>";
+"<p><a href=\"/gamer\">hit the quaran</a></p>";
 char reply[MSGSIZE]= 
 "HTTP/1.1 200 OK\n"
 "Date: Thu, 19 Feb 2009 12:27:04 GMT\n"
@@ -25,7 +39,7 @@ char reply[MSGSIZE]=
 "Last-Modified: Wed, 18 Jun 2003 16:05:58 GMT\n"
 "ETag: \"56d-9989200-1132c580\"\n"
 "Content-Type: text/html\n"
-"Content-Length: 30\n"
+"Content-Length: 50\n"
 "Accept-Ranges: bytes\n"
 "Connection: close\n"
 "\n"; 
@@ -35,6 +49,7 @@ strcat(reply,content);
      struct sockaddr_in serv_addr, cli_addr;
      int n;
      int flag = 1;
+     int gamer = 0;
      if (argc < 2) {
          fprintf(stderr,"ERROR, no port provided\n");
          exit(1);
@@ -52,19 +67,27 @@ strcat(reply,content);
               error("ERROR on binding");
      listen(sockfd,5);
      clilen = sizeof(cli_addr);
-     newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
      while (flag){
+     newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
      if (newsockfd < 0) 
           error("ERROR on accept");
      bzero(buffer,MSGSIZE);
      n = read(newsockfd,buffer,MSGSIZE);
      if (n < 0) error("ERROR reading from socket");
-     printf("Here is the message: %s\n",buffer);
-     if (strstr(buffer, "STOP") != NULL)
-	     flag = 0;
+     printf("Here is the request: %s\n",buffer);
+     //if (strstr(buffer, "STOP") != NULL)
+//	     flag = 0;
+     if (strstr(buffer,"/gamer") != NULL)
+	     gamer = 1;
+     else
+	     gamer = 0;
+     printf("gamer is %d", gamer);
      bzero(buffer,MSGSIZE);
      if (flag){
-	     printf("%d\n%s", strlen(reply), reply);
+//	     printf("%d\n%s", strlen(reply), reply);
+	     if (gamer)     
+	     	n = write(newsockfd,gamerreply,strlen(gamerreply));
+	     else
 	     n = write(newsockfd,reply,strlen(reply));
      }
 	else
