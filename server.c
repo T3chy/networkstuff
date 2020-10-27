@@ -7,6 +7,26 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include<signal.h>
+struct htmlresponse {
+	int code;
+	char date[29];
+	char server[29];
+	char lastModified[29];
+	int contentLength;
+	char contentType[29];
+	char connection[10];
+
+};
+char * generateresponse(struct htmlresponse meta,char content[], char * response){
+	char codename[10];
+	// making date entry
+	if (meta.code == 200)
+		strcpy(codename, "OK");
+	else
+		strcpy(codename, "yeet");
+	snprintf(response, MSGSIZE, "HTTP/1.1 %d %s\n Date: %s\n Server: %s\n Last-Modified: %s\n Content-Type: %s\n Content-Length: %d\n Connection: %s\n%s",meta.code, codename, meta.date, meta.server,meta.lastModified, meta.contentType, meta.contentLength, meta.connection);
+	return (char *)response;
+}
 void error(char *msg)
 {
     perror(msg);
