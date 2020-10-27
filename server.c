@@ -74,34 +74,21 @@ struct htmlresponse game = {200, "Thu, 19 Feb 2009 12:27:04 GMT","Apache/2.2.3",
      n = read(newsockfd,buffer,MSGSIZE);
      if (n < 0) error("ERROR reading from socket");
      printf("Here is the request: %s\n",buffer);
+     if (strstr(buffer, "/stop") != NULL){
+		printf("exiting!");	  
+		close(newsockfd);
+		break;
+     }
      if (strstr(buffer,"/gamer") != NULL)
 	     gamer = 1;
      else
 	     gamer = 0;
      bzero(buffer,MSGSIZE);
-     char *help = 
-	     "HTTP/1.1 200 OK\n"
-	     "Date: Thu, 19 Feb 2009 12:27:04 GMT\n"
-	     "Server: Apache/2.2.3\n"
-	     "Last-Modified: Wed, 18 Jun 2003 16:05:58 GMT\n"
-	     "ETag: \"56d-9989200-1132c580\"\n"
-	     "Content-Type: text/html\n"
-	     "Content-Length: 15\n"
-	     "Accept-Ranges: bytes\n"
-	     "Connection: close\n"
-	     "\n"
-	     "sdfkjsdnbfkjbsf";
      if (1){
 	     if (!gamer){
 		     printf("fetching home page!");
 		     generateresponse(game,content,(char*)buffer);
 		     n = write(newsockfd,buffer,strlen(buffer));
-		     printf("\n working: \n %s \n", help);
-		     printf("\n not working?: \n %s \n", buffer);
-		     
-		     
-		     //n = write(newsockfd,help,strlen(help));
-		     printf("n is %d\n", n);
 	     }else { 
 		     printf("fetching gamer page!");
 		     generateresponse(game,gamercontent,(char*)buffer);
